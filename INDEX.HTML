@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Weatherly provides current weather conditions, hourly forecasts, and a 7-day weather forecast.">
+
+    <title>Weatherly | Weather Forecast</title>
+
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="index.css">
+
+    <!-- JavaScript File -->
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+
+    <svg class="weather-icon-library" aria-hidden="true" focusable="false">
+        <symbol id="weather-sunny" viewBox="0 0 64 64">
+            <circle class="icon-sun" cx="32" cy="32" r="10"></circle>
+            <path class="icon-sun-rays" d="M32 6v7m0 38v7M6 32h7m38 0h7M13.6 13.6l5 5m26.8 26.8 5 5m0-36.8-5 5m-26.8 26.8-5 5"></path>
+        </symbol>
+        <symbol id="weather-mainly-clear" viewBox="0 0 64 64">
+            <circle class="icon-sun" cx="25" cy="24" r="9"></circle>
+            <path class="icon-sun-rays" d="M25 7v5m0 24v5M8 24h5m24 0h5M13 12l4 4m16 16 4 4m0-24-4 4m-16 16-4 4"></path>
+            <path class="icon-cloud" d="M19 48h29a9 9 0 0 0 0-18 13 13 0 0 0-24-3 10 10 0 0 0-5 21Z"></path>
+        </symbol>
+        <symbol id="weather-partly-cloudy" viewBox="0 0 64 64">
+            <circle class="icon-sun" cx="24" cy="23" r="9"></circle>
+            <path class="icon-sun-rays" d="M24 6v5m0 24v5M7 23h5m24 0h5M12 11l4 4m16 16 4 4m0-24-4 4m-16 16-4 4"></path>
+            <path class="icon-cloud" d="M17 49h32a10 10 0 0 0 0-20 14 14 0 0 0-26-3 11 11 0 0 0-6 23Z"></path>
+        </symbol>
+        <symbol id="weather-cloudy" viewBox="0 0 64 64">
+            <path class="icon-cloud" d="M15 48h35a11 11 0 0 0 0-22 15 15 0 0 0-29-3 12 12 0 0 0-6 25Z"></path>
+        </symbol>
+        <symbol id="weather-fog" viewBox="0 0 64 64">
+            <path class="icon-cloud" d="M17 39h30a9 9 0 0 0 0-18 13 13 0 0 0-24-3 10 10 0 0 0-6 21Z"></path>
+            <path class="icon-weather-line" d="M10 47h38m-31 7h28"></path>
+        </symbol>
+        <symbol id="weather-drizzle" viewBox="0 0 64 64">
+            <path class="icon-cloud" d="M15 38h35a11 11 0 0 0 0-22 15 15 0 0 0-29-3 12 12 0 0 0-6 25Z"></path>
+            <path class="icon-rain-light" d="m23 45-3 6m14-6-3 6m14-6-3 6"></path>
+        </symbol>
+        <symbol id="weather-rain" viewBox="0 0 64 64">
+            <path class="icon-cloud" d="M15 37h35a11 11 0 0 0 0-22 15 15 0 0 0-29-3 12 12 0 0 0-6 25Z"></path>
+            <path class="icon-rain" d="m22 44-4 9m15-9-4 9m15-9-4 9"></path>
+        </symbol>
+        <symbol id="weather-snow" viewBox="0 0 64 64">
+            <path class="icon-cloud" d="M15 35h35a11 11 0 0 0 0-22 15 15 0 0 0-29-3 12 12 0 0 0-6 25Z"></path>
+            <path class="icon-snow" d="M23 43v12m-5-9 10 6m0-6-10 6m19-9v12m-5-9 10 6m0-6-10 6"></path>
+        </symbol>
+        <symbol id="weather-thunderstorm" viewBox="0 0 64 64">
+            <path class="icon-cloud" d="M15 34h35a11 11 0 0 0 0-22 15 15 0 0 0-29-3 12 12 0 0 0-6 25Z"></path>
+            <path class="icon-lightning" d="m34 34-10 15h9l-3 11 14-18h-10l5-8"></path>
+        </symbol>
+        <symbol id="weather-fallback" viewBox="0 0 64 64">
+            <path class="icon-cloud" d="M15 48h35a11 11 0 0 0 0-22 15 15 0 0 0-29-3 12 12 0 0 0-6 25Z"></path>
+        </symbol>
+    </svg>
+
+    <!-- ================= HEADER & NAVIGATION ================= -->
+
+    <header class="site-header">
+
+        <nav class="navbar">
+
+            <!-- Logo -->
+            <a href="#home" class="logo">
+                <span class="logo-icon" aria-hidden="true">☀</span>
+                <span class="logo-text">Weatherly</span>
+            </a>
+
+            <!-- Navigation Links -->
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#hourly">Hourly Forecast</a></li>
+                <li><a href="#weekly">7-Day Forecast</a></li>
+            </ul>
+
+            <!-- City Search -->
+            <form class="search-form" id="search-form">
+
+                <label for="city-search" class="visually-hidden">
+                    Search for a city
+                </label>
+
+                <input
+                    type="search"
+                    id="city-search"
+                    name="city"
+                    placeholder="Search city..."
+                    required
+                >
+
+                <button type="submit" id="search-button">
+                    Search
+                </button>
+
+            </form>
+
+            <!-- Temperature Unit Toggle -->
+            <button
+                type="button"
+                class="unit-toggle"
+                id="unit-toggle"
+                aria-label="Switch temperature unit"
+            >
+                °C / °F
+            </button>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <main class="main-content">
+
+        <!-- ================= CURRENT WEATHER ================= -->
+
+        <section class="current-weather" id="home">
+
+            <!-- Location Information -->
+            <div class="location-info">
+
+                <p class="section-label">CURRENT WEATHER</p>
+
+                <h1 id="city-name">Lagos, Nigeria</h1>
+
+                <p class="current-date" id="current-date">
+                    Thursday, October 29
+                </p>
+
+            </div>
+
+
+            <!-- Main Weather Overview -->
+            <div class="weather-overview">
+
+                <!-- Temperature -->
+                <div class="temperature-info">
+
+                    <p class="temperature" id="temperature">
+                        29°C
+                    </p>
+
+                    <p class="feels-like" id="feels-like">
+                        Feels like 32°C
+                    </p>
+
+                </div>
+
+
+                <!-- Weather Condition -->
+                <div class="weather-condition">
+
+                    <svg
+                        class="main-weather-icon"
+                        id="weather-icon"
+                        role="img"
+                        aria-label="Sunny weather"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-sunny"></use></svg>
+
+                    <p id="weather-description">
+                        Mostly Sunny
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Today's High and Low -->
+            <div class="temperature-range">
+
+                <p>
+                    High:
+                    <span id="high-temperature">32°C</span>
+                </p>
+
+                <p>
+                    Low:
+                    <span id="low-temperature">25°C</span>
+                </p>
+
+            </div>
+
+
+            <!-- Sunrise and Sunset -->
+            <div class="sun-times">
+
+                <div class="sunrise">
+                    <span aria-hidden="true">🌅</span>
+
+                    <p>Sunrise</p>
+
+                    <time id="sunrise-time">6:15 AM</time>
+                </div>
+
+                <div class="sunset">
+                    <span aria-hidden="true">🌇</span>
+
+                    <p>Sunset</p>
+
+                    <time id="sunset-time">6:20 PM</time>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= WEATHER HIGHLIGHTS ================= -->
+
+        <section
+            class="weather-highlights"
+            aria-labelledby="highlights-title"
+        >
+
+            <div class="section-heading">
+
+                <h2 id="highlights-title">
+                    Today's Weather Highlights
+                </h2>
+
+                <p>Important weather conditions at a glance.</p>
+
+            </div>
+
+
+            <!-- Weather Highlights Grid -->
+            <div class="highlights-grid">
+
+
+                <!-- Humidity -->
+                <article class="highlight-card">
+
+                    <div class="card-heading">
+                        <span aria-hidden="true">💧</span>
+                        <h3>Humidity</h3>
+                    </div>
+
+                    <p class="highlight-value">
+                        <span id="humidity">72</span>%
+                    </p>
+
+                    <p class="card-description">
+                        Relative humidity
+                    </p>
+
+                </article>
+
+
+                <!-- Wind Speed -->
+                <article class="highlight-card">
+
+                    <div class="card-heading">
+                        <span aria-hidden="true">💨</span>
+                        <h3>Wind Speed</h3>
+                    </div>
+
+                    <p class="highlight-value">
+                        <span id="wind-speed">14</span>
+                        <span id="wind-unit">km/h</span>
+                    </p>
+
+                    <p class="card-description">
+                        Current wind speed ·
+                        <span id="wind-direction">—</span>
+                    </p>
+
+                </article>
+
+
+                <!-- UV Index -->
+                <article class="highlight-card">
+
+                    <div class="card-heading">
+                        <span aria-hidden="true">☀️</span>
+                        <h3>UV Index</h3>
+                    </div>
+
+                    <p class="highlight-value" id="uv-index">
+                        6
+                    </p>
+
+                    <p class="card-description" id="uv-description">
+                        High
+                    </p>
+
+                </article>
+
+
+                <!-- Visibility -->
+                <article class="highlight-card">
+
+                    <div class="card-heading">
+                        <span aria-hidden="true">👁️</span>
+                        <h3>Visibility</h3>
+                    </div>
+
+                    <p class="highlight-value">
+                        <span id="visibility">10</span> km
+                    </p>
+
+                    <p class="card-description">
+                        Visibility distance
+                    </p>
+
+                </article>
+
+
+                <!-- Atmospheric Pressure -->
+                <article class="highlight-card">
+
+                    <div class="card-heading">
+                        <span aria-hidden="true">🌡️</span>
+                        <h3>Pressure</h3>
+                    </div>
+
+                    <p class="highlight-value">
+                        <span id="pressure">1012</span> hPa
+                    </p>
+
+                    <p class="card-description">
+                        Atmospheric pressure
+                    </p>
+
+                </article>
+
+
+                <!-- Chance of Rain -->
+                <article class="highlight-card">
+
+                    <div class="card-heading">
+                        <span aria-hidden="true">🌧️</span>
+                        <h3>Chance of Rain</h3>
+                    </div>
+
+                    <p class="highlight-value">
+                        <span id="rain-chance">20</span>%
+                    </p>
+
+                    <p class="card-description">
+                        Probability of precipitation
+                    </p>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= HOURLY FORECAST ================= -->
+
+        <section class="hourly-forecast" id="hourly">
+
+            <div class="section-heading">
+
+                <h2>Hourly Forecast</h2>
+
+                <p>Weather conditions for the next 24 hours.</p>
+
+            </div>
+
+
+            <!-- Hourly Forecast Cards -->
+            <div
+                class="hourly-container"
+                id="hourly-container"
+                aria-label="Hourly weather forecast for the next 24 hours"
+                tabindex="0"
+            >
+
+
+                <!-- Hour 1 -->
+                <article class="hourly-card">
+
+                    <time datetime="09:00">9 AM</time>
+
+                    <svg
+                        class="hourly-icon"
+                        role="img"
+                        aria-label="Sunny"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-sunny"></use></svg>
+
+                    <p class="hourly-temperature">27°C</p>
+
+                    <p class="hourly-rain">10% rain</p>
+
+                </article>
+
+
+                <!-- Hour 2 -->
+                <article class="hourly-card">
+
+                    <time datetime="10:00">10 AM</time>
+
+                    <svg
+                        class="hourly-icon"
+                        role="img"
+                        aria-label="Sunny"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-sunny"></use></svg>
+
+                    <p class="hourly-temperature">28°C</p>
+
+                    <p class="hourly-rain">10% rain</p>
+
+                </article>
+
+
+                <!-- Hour 3 -->
+                <article class="hourly-card">
+
+                    <time datetime="11:00">11 AM</time>
+
+                    <svg
+                        class="hourly-icon"
+                        role="img"
+                        aria-label="Partly cloudy"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-partly-cloudy"></use></svg>
+
+                    <p class="hourly-temperature">29°C</p>
+
+                    <p class="hourly-rain">20% rain</p>
+
+                </article>
+
+
+                <!-- Hour 4 -->
+                <article class="hourly-card">
+
+                    <time datetime="12:00">12 PM</time>
+
+                    <svg
+                        class="hourly-icon"
+                        role="img"
+                        aria-label="Partly cloudy"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-partly-cloudy"></use></svg>
+
+                    <p class="hourly-temperature">30°C</p>
+
+                    <p class="hourly-rain">20% rain</p>
+
+                </article>
+
+
+                <!-- Hour 5 -->
+                <article class="hourly-card">
+
+                    <time datetime="13:00">1 PM</time>
+
+                    <svg
+                        class="hourly-icon"
+                        role="img"
+                        aria-label="Rainy"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-rain"></use></svg>
+
+                    <p class="hourly-temperature">27°C</p>
+
+                    <p class="hourly-rain">60% rain</p>
+
+                </article>
+
+
+                <!-- Hour 6 -->
+                <article class="hourly-card">
+
+                    <time datetime="14:00">2 PM</time>
+
+                    <svg
+                        class="hourly-icon"
+                        role="img"
+                        aria-label="Cloudy"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-cloudy"></use></svg>
+
+                    <p class="hourly-temperature">28°C</p>
+
+                    <p class="hourly-rain">30% rain</p>
+
+                </article>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= SEVEN-DAY FORECAST ================= -->
+
+        <section class="weekly-forecast" id="weekly">
+
+            <div class="section-heading">
+
+                <h2>7-Day Forecast</h2>
+
+                <p>Plan ahead with the upcoming weather forecast.</p>
+
+            </div>
+
+
+            <!-- Weekly Forecast Cards -->
+            <div class="weekly-container" id="weekly-container">
+
+
+                <!-- Today -->
+                <article class="forecast-day">
+
+                    <h3>Today</h3>
+
+                    <svg
+                        class="forecast-icon"
+                        role="img"
+                        aria-label="Sunny"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-sunny"></use></svg>
+
+                    <p class="forecast-condition">Sunny</p>
+
+                    <div class="forecast-temperatures">
+                        <span class="forecast-high">32°C</span>
+                        <span class="forecast-low">25°C</span>
+                    </div>
+
+                </article>
+
+
+                <!-- Friday -->
+                <article class="forecast-day">
+
+                    <h3>Friday</h3>
+
+                    <svg
+                        class="forecast-icon"
+                        role="img"
+                        aria-label="Rainy"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-rain"></use></svg>
+
+                    <p class="forecast-condition">Rainy</p>
+
+                    <div class="forecast-temperatures">
+                        <span class="forecast-high">29°C</span>
+                        <span class="forecast-low">24°C</span>
+                    </div>
+
+                </article>
+
+
+                <!-- Saturday -->
+                <article class="forecast-day">
+
+                    <h3>Saturday</h3>
+
+                    <svg
+                        class="forecast-icon"
+                        role="img"
+                        aria-label="Partly cloudy"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-partly-cloudy"></use></svg>
+
+                    <p class="forecast-condition">Partly Cloudy</p>
+
+                    <div class="forecast-temperatures">
+                        <span class="forecast-high">31°C</span>
+                        <span class="forecast-low">25°C</span>
+                    </div>
+
+                </article>
+
+
+                <!-- Sunday -->
+                <article class="forecast-day">
+
+                    <h3>Sunday</h3>
+
+                    <svg
+                        class="forecast-icon"
+                        role="img"
+                        aria-label="Cloudy"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-cloudy"></use></svg>
+
+                    <p class="forecast-condition">Cloudy</p>
+
+                    <div class="forecast-temperatures">
+                        <span class="forecast-high">30°C</span>
+                        <span class="forecast-low">24°C</span>
+                    </div>
+
+                </article>
+
+
+                <!-- Monday -->
+                <article class="forecast-day">
+
+                    <h3>Monday</h3>
+
+                    <svg
+                        class="forecast-icon"
+                        role="img"
+                        aria-label="Sunny"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-sunny"></use></svg>
+
+                    <p class="forecast-condition">Sunny</p>
+
+                    <div class="forecast-temperatures">
+                        <span class="forecast-high">32°C</span>
+                        <span class="forecast-low">25°C</span>
+                    </div>
+
+                </article>
+
+
+                <!-- Tuesday -->
+                <article class="forecast-day">
+
+                    <h3>Tuesday</h3>
+
+                    <svg
+                        class="forecast-icon"
+                        role="img"
+                        aria-label="Rainy"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-rain"></use></svg>
+
+                    <p class="forecast-condition">Rainy</p>
+
+                    <div class="forecast-temperatures">
+                        <span class="forecast-high">28°C</span>
+                        <span class="forecast-low">23°C</span>
+                    </div>
+
+                </article>
+
+
+                <!-- Wednesday -->
+                <article class="forecast-day">
+
+                    <h3>Wednesday</h3>
+
+                    <svg
+                        class="forecast-icon"
+                        role="img"
+                        aria-label="Sunny"
+                        viewBox="0 0 64 64"
+                    ><use href="#weather-sunny"></use></svg>
+
+                    <p class="forecast-condition">Sunny</p>
+
+                    <div class="forecast-temperatures">
+                        <span class="forecast-high">31°C</span>
+                        <span class="forecast-low">24°C</span>
+                    </div>
+
+                </article>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= LOADING & ERROR MESSAGES ================= -->
+
+        <div class="weather-status">
+
+            <p id="loading-message" role="status" hidden>
+                Loading weather information...
+            </p>
+
+            <p id="error-message" role="alert" hidden>
+                Unable to retrieve weather information.
+                Please check your city and try again.
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer class="site-footer">
+
+        <div class="footer-content">
+
+            <a href="#home" class="footer-logo">
+                <span aria-hidden="true">☀</span>
+                Weatherly
+            </a>
+
+            <p class="footer-description">
+                Your daily weather information, all in one place.
+            </p>
+
+
+            <!-- Footer Navigation -->
+            <nav class="footer-nav" aria-label="Footer navigation">
+
+                <ul class="footer-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#hourly">Hourly Forecast</a></li>
+                    <li><a href="#weekly">7-Day Forecast</a></li>
+                </ul>
+
+            </nav>
+
+
+            <!-- Copyright -->
+            <p class="copyright">
+                &copy; <span id="current-year">2026</span>
+                Weatherly. All rights reserved.
+            </p>
+
+        </div>
+
+    </footer>
+
+</body>
+
+</html>
